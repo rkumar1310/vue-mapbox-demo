@@ -1,5 +1,6 @@
 # mapbox-vue-demo
 
+![Screenshot](screen.png "Screenshot")
 ## Project setup
 ```
 yarn install

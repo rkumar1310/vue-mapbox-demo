@@ -1,58 +1,60 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <div id="map"></div>
 </template>
 
 <script>
+const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js')
+const axios = require('axios').default
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+  name: 'App',
+  components: {},
+  data() {
+    return {
+      accessToken:
+        'pk.eyJ1Ijoicmt1bWFyMTMxMCIsImEiOiJja25qZGY3dnkwMDQ4MnZueG5zbmhicnc1In0.eTr-OUJu1qVjdn0APX-y3Q',
+      mapStyle: 'mapbox://styles/mapbox/streets-v11',
+      layerId: 'firstLayer',
+      sourceId: 'firstSource',
+      coordinates: [-74.5, 40],
+      center: [-74.5, 40],
+      zoom: 10,
+      markers: [],
+    }
+  },
+  mounted() {
+    mapboxgl.accessToken =
+      'pk.eyJ1Ijoicmt1bWFyMTMxMCIsImEiOiJja25qZDR1bncwMDBlMm5wOHNkdGs2Y3ZjIn0.ME3c0Lu9x7JPrzgWFU6lpg'
+    var map = new mapboxgl.Map({
+      container: 'map', // container id
+      style: 'mapbox://styles/mapbox/streets-v11', // style URL
+      center: [-74.5, 40], // starting position [lng, lat]
+      zoom: 9, // starting zoom
+    })
+    axios.get('/markers.json').then(({ data }) => {
+      data.forEach((marker) => {
+        // Create a default Marker and add it to the map.
+        
+        // create the popup
+        var popup = new mapboxgl.Popup({ offset: 25 }).setText(
+          marker.address + ' / ' + marker.report_type
+        )
+        new mapboxgl.Marker().setLngLat(marker.point.coordinates).setPopup(popup).addTo(map)
+      })
+    })
+  },
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
+<style>
+body {
+  margin: 0;
   padding: 0;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
 }
 </style>
